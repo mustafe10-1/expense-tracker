@@ -1,6 +1,4 @@
-from flask import redirect
-from flask import render_template
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, redirect
 import sqlite3
 
 app = Flask(__name__)
