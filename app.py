@@ -1,3 +1,4 @@
+from flask import redirect
 from flask import render_template
 from flask import Flask, request, jsonify
 import sqlite3
@@ -92,6 +93,10 @@ def total():
     total_amount = cursor.fetchone()[0]
     conn.close()
     return jsonify({"total": total_amount})
+
+@app.route("/")
+def home():
+    return redirect("/dashboard")
 
 if __name__ == "__main__":
     init_db()
