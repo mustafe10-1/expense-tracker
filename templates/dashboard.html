@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Expense Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <h1>Expense Dashboard</h1>
+    <h2 id="totalSpend">Total Spend: Loading...</h2>
+
+<script>
+    // Load total spend
+    fetch("/total")
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById("totalSpend").innerText =
+                "Total Spend: £" + data.total.toFixed(2);
+        });
+</script>
+
+    <p>If you can see this text, the template is loading correctly.</p>
+
+    <canvas id="expenseChart" width="600" height="300"></canvas>
+
+    <br><br>
+    <canvas id="pieChart" width="400" height="300"></canvas>
+
+
+    <script>
+        // Fetch data from the /summary endpoint
+        fetch("/summary")
+            .then(response => response.json())
+            .then(data => {
+                console.log("Summary data:", data); // for debugging
+
+                const labels = data.map(item => item[0]);
+                const values = data.map(item => item[1]);
+
+                const ctx = document.getElementById("expenseChart");
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Total Spending by Category (£)',
+                            data: values
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return '£' + context.raw.toFixed(2);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: {
+                                    callback: function(value) {
+                                        return '£' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+
+
+                const pieCtx = document.getElementById("pieChart");
+
+                new Chart(pieCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Category Breakdown (£)",
+                            data: values
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': £' + context.raw.toFixed(2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+            })
+            .catch(err => {
+                console.error("Error fetching summary:", err);
+            });
+    </script>
+</body>
+</html>
